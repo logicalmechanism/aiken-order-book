@@ -129,22 +129,8 @@ pub fn tx_valid(
   tx
 }
 
-test find_out_datum() {
-  let script_addr = address.payment_address(#"0102", None)
-  let sell_addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
-  let tx = tx_valid(script_addr, script_addr, sell_addr, buy_addr, script_addr)
-  let outbound_output =
-    list.find(tx.outputs, fn(output) { output.address == script_addr })
-  expect outbound_datum: Datum = data.find_outbound_datum(outbound_output)
-  outbound_datum == datum_a_cont()
-}
-// test good_part_swap_tx() {
+// this is throwing a FreeUnique error
+// test find_out_datum() {
 //   let script_addr = address.payment_address(#"0102", None)
 //   let sell_addr =
 //     address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
@@ -153,15 +139,30 @@ test find_out_datum() {
 //       #"acab",
 //       Some(Inline(VerificationKeyCredential(#""))),
 //     )
-//   let utxo = UTxO(#"", 1)
-//   validators.part_swap_validation(
-//     datum_a(),
-//     tx_valid(script_addr, script_addr, sell_addr, buy_addr, script_addr),
-//     utxo,
-//     out_ref0(),
-//   ) == True
+//   let tx = tx_valid(script_addr, script_addr, sell_addr, buy_addr, script_addr)
+//   let outbound_output =
+//     list.find(tx.outputs, fn(output) { output.address == script_addr })
+//   expect outbound_datum: Datum = data.find_outbound_datum(outbound_output)
+//   outbound_datum == datum_a_cont()
 // }
-
+// this cant find the correct output
+test good_part_swap_tx() {
+  let script_addr = address.payment_address(#"0102", None)
+  let sell_addr =
+    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
+  let buy_addr =
+    address.payment_address(
+      #"acab",
+      Some(Inline(VerificationKeyCredential(#""))),
+    )
+  let utxo = UTxO(#"", 1)
+  validators.part_swap_validation(
+    datum_a(),
+    tx_valid(script_addr, script_addr, sell_addr, buy_addr, script_addr),
+    utxo,
+    out_ref0(),
+  ) == True
+}
 // test good_part_swap_tx2() {
 //   let script_addr = address.payment_address(#"0102", None)
 //   let sell_addr =

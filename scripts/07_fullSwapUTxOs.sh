@@ -1,23 +1,24 @@
 #!/bin/bash
 set -e
-source ../.env
+
+source .env
 
 #
-script_path="../order-book-contract/order-book-contract.plutus"
+script_path="../order_book.plutus"
 script_address=$(${cli} address build --payment-script-file ${script_path} ${network})
 
-# collat, seller, reference
+# seller
 seller_address=$(cat wallets/seller-wallet/payment.addr)
 seller_pkh=$(${cli} address key-hash --payment-verification-key-file wallets/seller-wallet/payment.vkey)
 
-#
+# buyer
 buyer_address=$(cat wallets/buyer-wallet/payment.addr)
 buyer_pkh=$(${cli} address key-hash --payment-verification-key-file wallets/buyer-wallet/payment.vkey)
 
-#
+# batcher
 batcher_address=$(cat wallets/profit-wallet/payment.addr)
 
-#
+# collateral
 collat_address=$(cat wallets/collat-wallet/payment.addr)
 collat_pkh=$(${cli} address key-hash --payment-verification-key-file wallets/collat-wallet/payment.vkey)
 
@@ -33,7 +34,6 @@ if [ "${TXNS}" -eq "0" ]; then
    exit;
 fi
 
-
 TXIN=$(jq -r --arg alltxin "" --arg sellerPkh "${seller_pkh}" 'to_entries[] | select(.value.inlineDatum.fields[0].fields[0].bytes == $sellerPkh) | .key | . + $alltxin + " --tx-in"' tmp/script_utxo.json)
 seller_utxo=${TXIN::-8}
 echo SELLER UTXO ${seller_utxo}
@@ -43,6 +43,7 @@ IFS='#' read -ra array <<< "$string"
 # update tx id info
 variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/buyer_full_swap_redeemer.json > data/redeemer/buyer_full_swap_redeemer-new.json
 mv data/redeemer/buyer_full_swap_redeemer-new.json data/redeemer/buyer_full_swap_redeemer.json
+
 variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/buyer_full_swap_redeemer.json > data/redeemer/buyer_full_swap_redeemer-new.json
 mv data/redeemer/buyer_full_swap_redeemer-new.json data/redeemer/buyer_full_swap_redeemer.json
 
@@ -55,9 +56,9 @@ IFS='#' read -ra array <<< "$string"
 # update tx id info
 variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/seller_full_swap_redeemer.json > data/redeemer/seller_full_swap_redeemer-new.json
 mv data/redeemer/seller_full_swap_redeemer-new.json data/redeemer/seller_full_swap_redeemer.json
+
 variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/seller_full_swap_redeemer.json > data/redeemer/seller_full_swap_redeemer-new.json
 mv data/redeemer/seller_full_swap_redeemer-new.json data/redeemer/seller_full_swap_redeemer.json
-
 
 buyer_asset="24000 0ed672eef8d5d58a6fbce91327baa25636a8ff97af513e3481c97c52.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6734"
 
@@ -65,20 +66,17 @@ buyer_utxo_value=$(${cli} transaction calculate-min-required-utxo \
     --babbage-era \
     --protocol-params-file tmp/protocol.json \
     --tx-out="${script_address} + 5000000 + ${buyer_asset}" | tr -dc '0-9')
-    # --tx-out-inline-datum-file data/datum/buyer_book_datum.json \
 
-seller_asset="50000000000000 0ed672eef8d5d58a6fbce91327baa25636a8ff97af513e3481c97c52.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6734"
+# asset to trade
+seller_asset="123456789 c34332d539bb554707a2d8826f2057bc628ac433a779c2f43d4a5b5c.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6731"
 
 seller_utxo_value=$(${cli} transaction calculate-min-required-utxo \
     --babbage-era \
     --protocol-params-file tmp/protocol.json \
     --tx-out="${script_address} + 5000000 + ${seller_asset}" | tr -dc '0-9')
-    # --tx-out-inline-datum-file data/datum/seller_book_datum.json \
 
 buyer_address_out="${buyer_address} + ${seller_utxo_value} + ${seller_asset}"
-# buyer_address_out="${buyer_address} + 1250000"
-# seller_address_out="${seller_address} + ${buyer_utxo_value} + ${buyer_asset}"
-seller_address_out="${seller_address} + 5000000000"
+seller_address_out="${seller_address} + 100000000"
 echo "Buyer OUTPUT: "${buyer_address_out}
 echo "Seller OUTPUT: "${seller_address_out}
 #

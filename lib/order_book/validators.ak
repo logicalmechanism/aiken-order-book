@@ -116,7 +116,7 @@ pub fn full_swap_validation(
         this_validating_value,
         this_datum.have.pid,
         this_datum.have.tkn,
-      ) == this_datum.have.amt)?,
+      ) >= this_datum.have.amt)?,
       // the other address gets paid this have token
       address.find_token_payout(that_addr, this_datum.have, tx.outputs)?,
     ],
@@ -158,7 +158,7 @@ pub fn part_swap_validation(
         this_validating_value,
         this_datum.have.pid,
         this_datum.have.tkn,
-      ) == this_datum.have.amt)?,
+      ) >= this_datum.have.amt)?,
       // big fish little fish partial swap
       if datums.check_if_cont(this_datum, that_datum) == True {
         // little fish pays big fish
@@ -220,7 +220,7 @@ pub fn full_buy_validation(
       // no script outputs
       (address.count_script_outputs(tx.outputs, script_addr, 0) == 0)?,
       // owner can not lie
-      (value.quantity_of(validating_value, datum.have.pid, datum.have.tkn) == datum.have.amt)?,
+      (value.quantity_of(validating_value, datum.have.pid, datum.have.tkn) >= datum.have.amt)?,
     ],
   )
 }
@@ -271,7 +271,7 @@ pub fn part_buy_validation(
       // single script output
       (address.count_script_outputs(tx.outputs, script_addr, 0) == 1)?,
       // owner can not lie
-      (value.quantity_of(validating_value, datum.have.pid, datum.have.tkn) == datum.have.amt)?,
+      (value.quantity_of(validating_value, datum.have.pid, datum.have.tkn) >= datum.have.amt)?,
       // buyer can buy what the owner doesn't have
       (value.quantity_of(validating_value, datum.have.pid, datum.have.tkn) >= amount.amt)?,
     ],

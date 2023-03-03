@@ -1,6 +1,5 @@
 use aiken/list
 use aiken/transaction.{Input, OutputReference, Transaction, TransactionId}
-use aiken/transaction/credential.{Inline, VerificationKeyCredential}
 use aiken/transaction/value.{Value}
 use order_book/address
 use order_book/data

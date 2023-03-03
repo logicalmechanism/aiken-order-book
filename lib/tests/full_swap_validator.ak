@@ -3,7 +3,7 @@ use aiken/interval.{Interval, IntervalBound, NegativeInfinity, PositiveInfinity}
 use aiken/transaction.{
   InlineDatum, Input, Output, OutputReference, Transaction, TransactionId,
 }
-use aiken/transaction/credential.{Address, Inline, VerificationKeyCredential}
+use aiken/transaction/credential.{Address}
 use aiken/transaction/value
 use order_book/address
 use order_book/datums.{Datum, OwnerInfo, SwapInfo, TokenInfo}
@@ -19,7 +19,7 @@ pub fn datum_a() -> Datum {
 }
 
 pub fn datum_b() -> Datum {
-  let owner: OwnerInfo = OwnerInfo { pkh: #"0102", sc: #"" }
+  let owner: OwnerInfo = OwnerInfo { pkh: #"acab", sc: #"" }
   let have: TokenInfo = TokenInfo { pid: #"acab", tkn: #"beef", amt: 100 }
   let want: TokenInfo = TokenInfo { pid: #"", tkn: #"", amt: 100 }
   let info: SwapInfo = SwapInfo { slip: 40 }
@@ -27,7 +27,7 @@ pub fn datum_b() -> Datum {
 }
 
 pub fn datum_c() -> Datum {
-  let owner: OwnerInfo = OwnerInfo { pkh: #"0102", sc: #"" }
+  let owner: OwnerInfo = OwnerInfo { pkh: #"acab", sc: #"" }
   let have: TokenInfo = TokenInfo { pid: #"acab", tkn: #"beef", amt: 99 }
   let want: TokenInfo = TokenInfo { pid: #"", tkn: #"", amt: 100 }
   let info: SwapInfo = SwapInfo { slip: 40 }
@@ -121,14 +121,9 @@ pub fn tx_valid(
 }
 
 test good_full_swap_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let sell_addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"0102",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let sell_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let utxo = UTxO(#"", 1)
   validators.full_swap_validation(
     datum_a(),
@@ -139,9 +134,8 @@ test good_full_swap_tx() {
 }
 
 test no_pay_full_swap_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let sell_addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
+  let script_addr = address.create_address(#"0102", #"")
+  let sell_addr = address.create_address(#"", #"")
   let utxo = UTxO(#"", 1)
   validators.full_swap_validation(
     datum_a(),
@@ -152,14 +146,9 @@ test no_pay_full_swap_tx() {
 }
 
 test bad_datum_full_swap_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let sell_addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"0102",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let sell_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let utxo = UTxO(#"", 1)
   validators.full_swap_validation(
     datum_a(),
@@ -170,14 +159,9 @@ test bad_datum_full_swap_tx() {
 }
 
 test one_input_full_swap_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let sell_addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"0102",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let sell_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let utxo = UTxO(#"", 1)
   validators.full_swap_validation(
     datum_a(),

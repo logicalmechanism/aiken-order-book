@@ -3,7 +3,7 @@ use aiken/interval.{Interval, IntervalBound, NegativeInfinity, PositiveInfinity}
 use aiken/transaction.{
   InlineDatum, Input, Output, OutputReference, Transaction, TransactionId,
 }
-use aiken/transaction/credential.{Address, Inline, VerificationKeyCredential}
+use aiken/transaction/credential.{Address}
 use aiken/transaction/value
 use order_book/address
 use order_book/datums.{Datum, OwnerInfo, SwapInfo, TokenInfo}
@@ -113,104 +113,78 @@ pub fn tx_valid(
 }
 
 test good_full_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
-  let buyer = BuyerInfo(#"acab", #"")
+  let script_addr = address.create_address(#"0102", #"")
+  let seller_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let buyer_info = BuyerInfo(#"acab", #"")
   validators.full_buy_validation(
     datum_a(),
-    tx_valid(script_addr, addr, addr, buy_addr, #"acab"),
+    tx_valid(script_addr, seller_addr, seller_addr, buy_addr, #"acab"),
     out_ref(),
-    buyer,
+    buyer_info,
   ) == True
 }
 
 test bad_signer_full_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
-  let buyer = BuyerInfo(#"acab", #"")
+  let script_addr = address.create_address(#"0102", #"")
+  let seller_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let buyer_info = BuyerInfo(#"acab", #"")
   validators.full_buy_validation(
     datum_a(),
-    tx_valid(script_addr, addr, addr, buy_addr, #""),
+    tx_valid(script_addr, seller_addr, seller_addr, buy_addr, #""),
     out_ref(),
-    buyer,
+    buyer_info,
   ) == False
 }
 
 test wrong_pay_full_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
-  let buyer = BuyerInfo(#"acab", #"")
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let buyer_info = BuyerInfo(#"acab", #"")
   validators.full_buy_validation(
     datum_a(),
     tx_valid(script_addr, addr, buy_addr, buy_addr, #"acab"),
     out_ref(),
-    buyer,
+    buyer_info,
   ) == False
 }
 
 test wrong_buy_full_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buyer = BuyerInfo(#"acab", #"")
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buyer_info = BuyerInfo(#"acab", #"")
   validators.full_buy_validation(
     datum_a(),
     tx_valid(script_addr, addr, addr, addr, #"acab"),
     out_ref(),
-    buyer,
+    buyer_info,
   ) == False
 }
 
 test two_inputs_full_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
-  let buyer = BuyerInfo(#"acab", #"")
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let buyer_info = BuyerInfo(#"acab", #"")
   validators.full_buy_validation(
     datum_a(),
     tx_valid(script_addr, script_addr, addr, buy_addr, #"acab"),
     out_ref(),
-    buyer,
+    buyer_info,
   ) == False
 }
 
 test not_enough_full_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
-  let buyer = BuyerInfo(#"acab", #"")
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let buyer_info = BuyerInfo(#"acab", #"")
   validators.full_buy_validation(
     datum_a(),
     tx_valid(addr, script_addr, addr, buy_addr, #"acab"),
     bad_out_ref(),
-    buyer,
+    buyer_info,
   ) == False
 }

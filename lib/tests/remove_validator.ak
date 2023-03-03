@@ -4,7 +4,7 @@ use aiken/transaction.{
   InlineDatum, Input, NoDatum, Output, OutputReference, Transaction,
   TransactionId,
 }
-use aiken/transaction/credential.{Address, Inline, VerificationKeyCredential}
+use aiken/transaction/credential.{Address}
 use aiken/transaction/value
 use order_book/address
 use order_book/datums.{Datum, OwnerInfo, SwapInfo, TokenInfo}
@@ -99,9 +99,8 @@ pub fn tx_valid(
 }
 
 test good_remove_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
   validators.remove_validation(
     datum_a(),
     tx_valid(script_addr, addr, addr, #""),
@@ -110,9 +109,8 @@ test good_remove_tx() {
 }
 
 test wrong_signer_remove_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
   validators.remove_validation(
     datum_a(),
     tx_valid(script_addr, addr, addr, #"acab"),
@@ -121,9 +119,8 @@ test wrong_signer_remove_tx() {
 }
 
 test double_script_remove_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
   validators.remove_validation(
     datum_a(),
     tx_valid(script_addr, script_addr, addr, #""),
@@ -132,12 +129,8 @@ test double_script_remove_tx() {
 }
 
 test wrong_payout_remove_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"acab", #"")
   validators.remove_validation(
     datum_a(),
     tx_valid(script_addr, addr, addr, #""),

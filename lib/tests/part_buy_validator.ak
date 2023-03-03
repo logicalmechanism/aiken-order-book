@@ -3,7 +3,7 @@ use aiken/interval.{Interval, IntervalBound, NegativeInfinity, PositiveInfinity}
 use aiken/transaction.{
   InlineDatum, Input, Output, OutputReference, Transaction, TransactionId,
 }
-use aiken/transaction/credential.{Address, Inline, VerificationKeyCredential}
+use aiken/transaction/credential.{Address}
 use aiken/transaction/value
 use order_book/address
 use order_book/datums.{Datum, OwnerInfo, SwapInfo, TokenInfo}
@@ -128,14 +128,9 @@ pub fn tx_valid(
 }
 
 test good_part_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let buyer = BuyerInfo(#"acab", #"")
   let buy_amt = BuyAmount(5)
   validators.part_buy_validation(
@@ -148,14 +143,9 @@ test good_part_buy_tx() {
 }
 
 test not_enough_part_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let buyer = BuyerInfo(#"acab", #"")
   let buy_amt = BuyAmount(15)
   validators.part_buy_validation(
@@ -168,14 +158,9 @@ test not_enough_part_buy_tx() {
 }
 
 test two_outputs_part_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let buyer = BuyerInfo(#"acab", #"")
   let buy_amt = BuyAmount(5)
   validators.part_buy_validation(
@@ -188,14 +173,9 @@ test two_outputs_part_buy_tx() {
 }
 
 test two_inputs_part_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let buyer = BuyerInfo(#"acab", #"")
   let buy_amt = BuyAmount(5)
   validators.part_buy_validation(
@@ -209,13 +189,13 @@ test two_inputs_part_buy_tx() {
 
 // no way to test for errors yet
 // test no_cont_tx_part_buy_tx() {
-//   let script_addr = address.payment_address(#"0102", None)
+//   let script_addr = address.create_address(#"0102", #"")
 //   let addr =
-//     address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
+//     address.create_address(#"", #"")
 //   let buy_addr =
-//     address.payment_address(
+//     address.create_address(
 //       #"acab",
-//       Some(Inline(VerificationKeyCredential(#""))),
+//       #"",
 //     )
 //   let buyer = BuyerInfo(#"acab", #"")
 //   let buy_amt = BuyAmount(5)
@@ -229,14 +209,9 @@ test two_inputs_part_buy_tx() {
 // }
 
 test no_pay_receive_part_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let buyer = BuyerInfo(#"acab", #"")
   let buy_amt = BuyAmount(5)
   validators.part_buy_validation(
@@ -249,14 +224,9 @@ test no_pay_receive_part_buy_tx() {
 }
 
 test bad_signer_part_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
-  let buy_addr =
-    address.payment_address(
-      #"acab",
-      Some(Inline(VerificationKeyCredential(#""))),
-    )
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
   let buyer = BuyerInfo(#"acab", #"")
   let buy_amt = BuyAmount(5)
   validators.part_buy_validation(
@@ -269,9 +239,8 @@ test bad_signer_part_buy_tx() {
 }
 
 test no_buy_receive_part_buy_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr =
-    address.payment_address(#"", Some(Inline(VerificationKeyCredential(#""))))
+  let script_addr = address.create_address(#"0102", #"")
+  let addr = address.create_address(#"", #"")
   let buyer = BuyerInfo(#"acab", #"")
   let buy_amt = BuyAmount(5)
   validators.part_buy_validation(

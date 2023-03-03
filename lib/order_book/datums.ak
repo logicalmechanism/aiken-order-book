@@ -1,6 +1,5 @@
 use aiken/hash.{Blake2b_224, Hash}
 use aiken/list
-use aiken/string
 use aiken/transaction/credential.{VerificationKey}
 use aiken/transaction/value.{Value}
 use order_book/math
@@ -77,14 +76,7 @@ pub fn part_swap_cont_check(
   that_datum: Datum,
 ) {
   let have_diff = inbound_datum.have.amt - that_datum.want.amt
-  trace string.concat(left: @"have diff: ", right: string.from_int(have_diff))
-  trace string.concat(
-    left: @"outbound: ",
-    right: string.from_int(outbound_datum.have.amt),
-  )
   let want_amt = have_diff * inbound_datum.want.amt / inbound_datum.have.amt
-  trace string.from_int(want_amt)
-  trace string.from_int(outbound_datum.want.amt)
   list.and(
     [
       (have_diff == outbound_datum.have.amt)?,

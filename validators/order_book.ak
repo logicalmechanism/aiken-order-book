@@ -10,6 +10,7 @@ validator order_book {
     when context.purpose is {
       Spend(output_reference) ->
         when redeemer is {
+          // Swap two UTxOs
           FullSwap { full } ->
             validators.full_swap_validation(
               datum,
@@ -17,6 +18,7 @@ validator order_book {
               full,
               output_reference,
             )
+          // Swap UTxOs with a partial fill script return
           PartSwap { part } ->
             validators.part_swap_validation(
               datum,
@@ -24,18 +26,21 @@ validator order_book {
               part,
               output_reference,
             )
+          // Owner can remove their UTxO
           Remove ->
             validators.remove_validation(
               datum,
               context.transaction,
               output_reference,
             )
+          // Owner can update their UTxO
           Update ->
             validators.update_validation(
               datum,
               context.transaction,
               output_reference,
             )
+          // Buyer can purchase a UTxO
           FullBuy { owner } ->
             validators.full_buy_validation(
               datum,
@@ -43,6 +48,7 @@ validator order_book {
               output_reference,
               owner,
             )
+          // Buyer can purchase an amount from UTxO with a partial fill script return
           PartBuy { owner, amount } ->
             validators.part_buy_validation(
               datum,

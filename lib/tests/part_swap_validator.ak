@@ -154,20 +154,43 @@ test good_part_swap_tx() {
     out_ref0(),
   ) == True
 }
-// test good_part_swap_tx2() {
-//   let script_addr = address.create_address(#"0102", #"")
-//   let sell_addr =
-//     address.create_address(#"", #"")
-//   let buy_addr =
-//     address.create_address(
-//       #"0102",
-//       #"",
-//     )
-//   let utxo = UTxO(#"", 0)
-//   validators.part_swap_validation(
-//     datum_b(),
-//     tx_valid(script_addr, script_addr, buy_addr, buy_addr, script_addr),
-//     utxo,
-//     out_ref2(),
-//   ) == True
-// }
+
+test good_part_swap_tx2() {
+  let script_addr = address.create_address(#"0102", #"")
+  let sell_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let utxo = UTxO(#"", 0)
+  validators.part_swap_validation(
+    datum_b(),
+    tx_valid(script_addr, script_addr, script_addr, sell_addr, buy_addr),
+    utxo,
+    out_ref1(),
+  ) == True
+}
+
+// this cant find the correct output
+test bad_part_swap_tx() {
+  let script_addr = address.create_address(#"0102", #"")
+  let sell_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let utxo = UTxO(#"", 1)
+  validators.part_swap_validation(
+    datum_a(),
+    tx_valid(script_addr, script_addr, script_addr, buy_addr, sell_addr),
+    utxo,
+    out_ref0(),
+  ) == False
+}
+
+test bad_part_swap_tx2() {
+  let script_addr = address.create_address(#"0102", #"")
+  let sell_addr = address.create_address(#"", #"")
+  let buy_addr = address.create_address(#"acab", #"")
+  let utxo = UTxO(#"", 0)
+  validators.part_swap_validation(
+    datum_b(),
+    tx_valid(script_addr, script_addr, script_addr, buy_addr, sell_addr),
+    utxo,
+    out_ref1(),
+  ) == False
+}

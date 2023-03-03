@@ -1,7 +1,7 @@
 use aiken/list
 use aiken/transaction.{Input, Output}
 use aiken/transaction/credential.{
-  Address, StakeCredential, VerificationKeyCredential,
+  Address, Inline, StakeCredential, VerificationKeyCredential,
 }
 use aiken/transaction/value.{Value}
 use order_book/datums.{PublicKeyHash, TokenInfo}
@@ -79,6 +79,20 @@ pub fn find_token_payout(
       )
     },
   )
+}
+
+pub fn create_address(
+  key_hash: PublicKeyHash,
+  stake_credential: PublicKeyHash,
+) -> Address {
+  if stake_credential == #"" {
+    payment_address(key_hash, None)
+  } else {
+    payment_address(
+      key_hash,
+      Some(Inline(VerificationKeyCredential(stake_credential))),
+    )
+  }
 }
 
 pub fn payment_address(

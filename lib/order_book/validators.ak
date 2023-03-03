@@ -37,17 +37,13 @@ pub fn remove_validation(
     )
   let validating_value = find_input_value(validating_input)
   let script_addr = address.find_input_address(validating_input)
-  let addr =
-    address.payment_address(
-      datum.owner.pkh,
-      Some(Inline(VerificationKeyCredential(datum.owner.sc))),
-    )
+  let seller_addr = address.create_address(datum.owner.pkh, datum.owner.sc)
   list.and(
     [
       // owner must sign it
       must_be_signed_by(tx, datum.owner.pkh)?,
       // owner must get the utxo back
-      address.find_exact_payout(addr, validating_value, tx.outputs)?,
+      address.find_exact_payout(seller_addr, validating_value, tx.outputs)?,
       // single script input
       (address.count_script_inputs(tx.inputs, script_addr, 0) == 1)?,
       // no script outputs
@@ -107,10 +103,7 @@ pub fn full_swap_validation(
     )
   expect that_datum: Datum = data.find_inbound_datum(that_vaidating_input)
   let that_addr =
-    address.payment_address(
-      that_datum.owner.pkh,
-      Some(Inline(VerificationKeyCredential(that_datum.owner.sc))),
-    )
+    address.create_address(that_datum.owner.pkh, that_datum.owner.sc)
   list.and(
     [
       // double script inputs
@@ -151,7 +144,8 @@ pub fn part_swap_validation(
       fn(input) { input.output_reference == that_output_reference },
     )
   expect that_datum: Datum = data.find_inbound_datum(that_vaidating_input)
-  let that_addr = address.payment_address(that_datum.owner.pkh, None)
+  let that_addr =
+    address.create_address(that_datum.owner.pkh, that_datum.owner.sc)
   list.and(
     [
       // double script inputs
@@ -212,16 +206,8 @@ pub fn full_buy_validation(
     )
   let validating_value = find_input_value(validating_input)
   let script_addr = address.find_input_address(validating_input)
-  let addr =
-    address.payment_address(
-      datum.owner.pkh,
-      Some(Inline(VerificationKeyCredential(datum.owner.sc))),
-    )
-  let buyer_addr =
-    address.payment_address(
-      buyer.pkh,
-      Some(Inline(VerificationKeyCredential(buyer.sc))),
-    )
+  let seller_addr = address.create_address(datum.owner.pkh, datum.owner.sc)
+  let buyer_addr = address.create_address(buyer.pkh, buyer.sc)
   list.and(
     [
       // the buyer must sign
@@ -229,7 +215,7 @@ pub fn full_buy_validation(
       // the buyer gets this values have token
       address.find_token_payout(buyer_addr, datum.have, tx.outputs)?,
       // the seller gets this datums want token
-      address.find_token_payout(addr, datum.want, tx.outputs)?,
+      address.find_token_payout(seller_addr, datum.want, tx.outputs)?,
       // single script input
       (address.count_script_inputs(tx.inputs, script_addr, 0) == 1)?,
       // no script outputs
@@ -254,16 +240,8 @@ pub fn part_buy_validation(
     )
   let validating_value = find_input_value(validating_input)
   let script_addr = address.find_input_address(validating_input)
-  let seller_addr =
-    address.payment_address(
-      datum.owner.pkh,
-      Some(Inline(VerificationKeyCredential(datum.owner.sc))),
-    )
-  let buyer_addr =
-    address.payment_address(
-      buyer.pkh,
-      Some(Inline(VerificationKeyCredential(buyer.sc))),
-    )
+  let seller_addr = address.create_address(datum.owner.pkh, datum.owner.sc)
+  let buyer_addr = address.create_address(buyer.pkh, buyer.sc)
   let buyer_token = TokenInfo(datum.have.pid, datum.have.tkn, amount.amt)
   let pay_amt = datums.token_price(datum, amount.amt)
   let pay_token = TokenInfo(datum.want.pid, datum.want.tkn, pay_amt)

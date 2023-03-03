@@ -129,7 +129,6 @@ pub fn tx_valid(
   tx
 }
 
-// this is throwing a FreeUnique error
 test find_out_datum() {
   let script_addr = address.create_address(#"0102", #"")
   let sell_addr = address.create_address(#"", #"")
@@ -141,7 +140,6 @@ test find_out_datum() {
   outbound_datum == datum_a_cont()
 }
 
-// this cant find the correct output
 test good_part_swap_tx() {
   let script_addr = address.create_address(#"0102", #"")
   let sell_addr = address.create_address(#"", #"")
@@ -168,7 +166,6 @@ test good_part_swap_tx2() {
   ) == True
 }
 
-// this cant find the correct output
 test bad_part_swap_tx() {
   let script_addr = address.create_address(#"0102", #"")
   let sell_addr = address.create_address(#"", #"")

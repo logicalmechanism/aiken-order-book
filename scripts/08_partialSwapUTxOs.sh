@@ -3,7 +3,7 @@ set -e
 
 source .env
 
-#
+# script info
 script_path="../order_book.plutus"
 script_address=$(${cli} address build --payment-script-file ${script_path} ${network})
 
@@ -41,11 +41,11 @@ echo SELLER UTXO ${seller_utxo}
 string=${seller_utxo}
 IFS='#' read -ra array <<< "$string"
 # update tx id info
-variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/full_buyer_swap_redeemer.json > data/redeemer/full_buyer_swap_redeemer-new.json
-mv data/redeemer/full_buyer_swap_redeemer-new.json data/redeemer/full_buyer_swap_redeemer.json
+variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/part_buyer_swap_redeemer.json > data/redeemer/part_buyer_swap_redeemer-new.json
+mv data/redeemer/part_buyer_swap_redeemer-new.json data/redeemer/part_buyer_swap_redeemer.json
 
-variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/full_buyer_swap_redeemer.json > data/redeemer/full_buyer_swap_redeemer-new.json
-mv data/redeemer/full_buyer_swap_redeemer-new.json data/redeemer/full_buyer_swap_redeemer.json
+variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/part_buyer_swap_redeemer.json > data/redeemer/part_buyer_swap_redeemer-new.json
+mv data/redeemer/part_buyer_swap_redeemer-new.json data/redeemer/part_buyer_swap_redeemer.json
 
 TXIN=$(jq -r --arg alltxin "" --arg buyerPkh "${buyer_pkh}" 'to_entries[] | select(.value.inlineDatum.fields[0].fields[0].bytes == $buyerPkh) | .key | . + $alltxin + " --tx-in"' tmp/script_utxo.json)
 buyer_utxo=${TXIN::-8}
@@ -54,29 +54,44 @@ echo BUYER UTXO ${buyer_utxo}
 string=${buyer_utxo}
 IFS='#' read -ra array <<< "$string"
 # update tx id info
-variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/full_seller_swap_redeemer.json > data/redeemer/full_seller_swap_redeemer-new.json
-mv data/redeemer/full_seller_swap_redeemer-new.json data/redeemer/full_seller_swap_redeemer.json
+variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/part_seller_swap_redeemer.json > data/redeemer/part_seller_swap_redeemer-new.json
+mv data/redeemer/part_seller_swap_redeemer-new.json data/redeemer/part_seller_swap_redeemer.json
+variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/part_seller_swap_redeemer.json > data/redeemer/part_seller_swap_redeemer-new.json
+mv data/redeemer/part_seller_swap_redeemer-new.json data/redeemer/part_seller_swap_redeemer.json
 
-variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/full_seller_swap_redeemer.json > data/redeemer/full_seller_swap_redeemer-new.json
-mv data/redeemer/full_seller_swap_redeemer-new.json data/redeemer/full_seller_swap_redeemer.json
+# exit
 
+# buyer asset
 buyer_asset="24000 0ed672eef8d5d58a6fbce91327baa25636a8ff97af513e3481c97c52.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6734"
 
-buyer_utxo_value=$(${cli} transaction calculate-min-required-utxo \
-    --babbage-era \
-    --protocol-params-file tmp/protocol.json \
-    --tx-out="${script_address} + 5000000 + ${buyer_asset}" | tr -dc '0-9')
-
 # asset to trade
-seller_asset="123456789 c34332d539bb554707a2d8826f2057bc628ac433a779c2f43d4a5b5c.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6731"
+seller_asset="61728394 c34332d539bb554707a2d8826f2057bc628ac433a779c2f43d4a5b5c.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6731"
+
+# asset to return
+script_asset="61728395 c34332d539bb554707a2d8826f2057bc628ac433a779c2f43d4a5b5c.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6731"
 
 seller_utxo_value=$(${cli} transaction calculate-min-required-utxo \
     --babbage-era \
     --protocol-params-file tmp/protocol.json \
+    --tx-out="${script_address} + 5000000 + ${buyer_asset}" | tr -dc '0-9')
+
+script_utxo_value=$(${cli} transaction calculate-min-required-utxo \
+    --babbage-era \
+    --protocol-params-file tmp/protocol.json \
+    --tx-out-inline-datum-file data/datum/seller_datum.json \
+    --tx-out="${script_address} + 5000000 + ${script_asset}" | tr -dc '0-9')
+
+buyer_utxo_value=$(${cli} transaction calculate-min-required-utxo \
+    --babbage-era \
+    --protocol-params-file tmp/protocol.json \
     --tx-out="${script_address} + 5000000 + ${seller_asset}" | tr -dc '0-9')
 
-buyer_address_out="${buyer_address} + ${seller_utxo_value} + ${seller_asset}"
-seller_address_out="${seller_address} + 100000000"
+script_address_out="${script_address} + ${script_utxo_value} + ${script_asset}"
+buyer_address_out="${buyer_address} + ${buyer_utxo_value} + ${seller_asset}"
+
+lovelace=$(jq -r '.fields[1].fields[2].int' data/datum/buyer_datum.json)
+seller_address_out="${seller_address} + ${lovelace}"
+echo "Script OUTPUT: "${script_address_out}
 echo "Buyer OUTPUT: "${buyer_address_out}
 echo "Seller OUTPUT: "${seller_address_out}
 #
@@ -126,14 +141,16 @@ FEE=$(${cli} transaction build \
     --spending-tx-in-reference="${script_ref_utxo}#1" \
     --spending-plutus-script-v2 \
     --spending-reference-tx-in-inline-datum-present \
-    --spending-reference-tx-in-redeemer-file data/redeemer/full_seller_swap_redeemer.json \
+    --spending-reference-tx-in-redeemer-file data/redeemer/part_seller_swap_redeemer.json \
     --tx-in ${buyer_utxo} \
     --spending-tx-in-reference="${script_ref_utxo}#1" \
     --spending-plutus-script-v2 \
     --spending-reference-tx-in-inline-datum-present \
-    --spending-reference-tx-in-redeemer-file data/redeemer/full_buyer_swap_redeemer.json \
+    --spending-reference-tx-in-redeemer-file data/redeemer/part_buyer_swap_redeemer.json \
     --tx-out="${seller_address_out}" \
     --tx-out="${buyer_address_out}" \
+    --tx-out="${script_address_out}" \
+    --tx-out-inline-datum-file data/datum/partial_seller_datum.json  \
     --required-signer-hash ${collat_pkh} \
     ${network})
 
@@ -142,7 +159,7 @@ IFS=' ' read -ra FEE <<< "${VALUE[1]}"
 FEE=${FEE[1]}
 echo -e "\033[1;32m Fee: \033[0m" $FEE
 #
-# exit
+exit
 #
 echo -e "\033[0;36m Signing \033[0m"
 ${cli} transaction sign \

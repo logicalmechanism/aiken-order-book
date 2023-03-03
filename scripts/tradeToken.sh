@@ -18,7 +18,7 @@ min_utxo=$(${cli} transaction calculate-min-required-utxo \
     --tx-out="${receiver_address} + 5000000 + ${assetA}" | tr -dc '0-9')
 
 # change_to_be_traded="${sender_address} + ${min_utxo} + ${assetB}"
-change_to_be_traded="${sender_address} + ${min_utxo} + ${assetA}"
+change_to_be_traded="${receiver_address} + ${min_utxo} + ${assetA}"
 token_to_be_traded="${receiver_address} + 100000000"
 # token_to_be_traded="${receiver_address} + ${min_utxo} + ${assetA}"
 

@@ -57,15 +57,15 @@ pub fn part_swap_datum_check(
 ) -> Bool {
   list.and(
     [
-      inbound_datum.owner.pkh != outbound_datum.owner.pkh,
-      inbound_datum.have.pid == outbound_datum.want.pid,
-      inbound_datum.have.tkn == outbound_datum.want.tkn,
+      (inbound_datum.owner.pkh != outbound_datum.owner.pkh)?,
+      (inbound_datum.have.pid == outbound_datum.want.pid)?,
+      (inbound_datum.have.tkn == outbound_datum.want.tkn)?,
       !math.is_int_in_range(
         inbound_datum.have.amt,
         inbound_datum.info.slip,
         outbound_datum.want.amt,
-      ),
-      is_in_effective_range(inbound_datum, outbound_datum),
+      )?,
+      is_in_effective_range(inbound_datum, outbound_datum)?,
     ],
   )
 }

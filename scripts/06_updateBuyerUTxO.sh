@@ -24,8 +24,11 @@ utxo_value=$(${cli} transaction calculate-min-required-utxo \
     --tx-out-inline-datum-file data/datum/buyer_datum.json \
     --tx-out="${script_address} + 5000000 + ${asset}" | tr -dc '0-9')
 
-ada_value=$((${utxo_value} + 5000000000))
-ada_value=$((500000 + 100000000))
+# ada_value=$((${utxo_value} + 5000000000))
+
+lovelace=$(jq -r '.fields[1].fields[2].int' data/datum/buyer_datum.json)
+
+ada_value=$((500000 + ${lovelace}))
 script_address_out="${script_address} + ${ada_value}"
 echo "Update OUTPUT: "${script_address_out}
 #

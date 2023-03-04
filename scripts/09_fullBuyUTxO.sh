@@ -38,28 +38,6 @@ TXIN=$(jq -r --arg alltxin "" --arg sellerPkh "${seller_pkh}" 'to_entries[] | se
 seller_utxo=${TXIN::-8}
 echo SELLER UTXO ${seller_utxo}
 
-# string=${seller_utxo}
-# IFS='#' read -ra array <<< "$string"
-# # update tx id info
-# variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/full_buyer_swap_redeemer.json > data/redeemer/full_buyer_swap_redeemer-new.json
-# mv data/redeemer/full_buyer_swap_redeemer-new.json data/redeemer/full_buyer_swap_redeemer.json
-
-# variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/full_buyer_swap_redeemer.json > data/redeemer/full_buyer_swap_redeemer-new.json
-# mv data/redeemer/full_buyer_swap_redeemer-new.json data/redeemer/full_buyer_swap_redeemer.json
-
-# TXIN=$(jq -r --arg alltxin "" --arg buyerPkh "${buyer_pkh}" 'to_entries[] | select(.value.inlineDatum.fields[0].fields[0].bytes == $buyerPkh) | .key | . + $alltxin + " --tx-in"' tmp/script_utxo.json)
-# buyer_utxo=${TXIN::-8}
-# echo BUYER UTXO ${buyer_utxo}
-
-# string=${buyer_utxo}
-# IFS='#' read -ra array <<< "$string"
-# # update tx id info
-# variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/full_seller_swap_redeemer.json > data/redeemer/full_seller_swap_redeemer-new.json
-# mv data/redeemer/full_seller_swap_redeemer-new.json data/redeemer/full_seller_swap_redeemer.json
-
-# variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/full_seller_swap_redeemer.json > data/redeemer/full_seller_swap_redeemer-new.json
-# mv data/redeemer/full_seller_swap_redeemer-new.json data/redeemer/full_seller_swap_redeemer.json
-
 buyer_asset="24000 0ed672eef8d5d58a6fbce91327baa25636a8ff97af513e3481c97c52.5468697349734f6e6553746172746572546f6b656e466f7254657374696e6734"
 
 buyer_utxo_value=$(${cli} transaction calculate-min-required-utxo \

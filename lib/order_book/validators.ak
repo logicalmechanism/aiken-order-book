@@ -243,13 +243,8 @@ pub fn part_buy_validation(
   let buyer_addr = address.create_address(buyer.pkh, buyer.sc)
   let buyer_token = TokenInfo(datum.have.pid, datum.have.tkn, amount.amt)
   let pay_amt = datums.token_price(datum, amount.amt)
-  let pay_token = TokenInfo(datum.want.pid, datum.want.tkn, pay_amt)
-  let pay_value =
-    value.from_asset(
-      datum.have.pid,
-      datum.have.tkn,
-      datum.have.amt - amount.amt,
-    )
+  let pay_token = TokenInfo(datum.want.pid, datum.want.tkn, amount.amt)
+  let pay_value = value.from_asset(datum.have.pid, datum.have.tkn, pay_amt)
   let partial_value = value.add(validating_value, value.negate(pay_value))
   let outbound_output =
     list.find(tx.outputs, fn(output) { output.address == script_addr })

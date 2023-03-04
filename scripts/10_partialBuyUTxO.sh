@@ -38,26 +38,26 @@ TXIN=$(jq -r --arg alltxin "" --arg sellerPkh "${seller_pkh}" 'to_entries[] | se
 seller_utxo=${TXIN::-8}
 echo SELLER UTXO ${seller_utxo}
 
-string=${seller_utxo}
-IFS='#' read -ra array <<< "$string"
-# update tx id info
-variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/part_buyer_swap_redeemer.json > data/redeemer/part_buyer_swap_redeemer-new.json
-mv data/redeemer/part_buyer_swap_redeemer-new.json data/redeemer/part_buyer_swap_redeemer.json
+# string=${seller_utxo}
+# IFS='#' read -ra array <<< "$string"
+# # update tx id info
+# variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/part_buyer_swap_redeemer.json > data/redeemer/part_buyer_swap_redeemer-new.json
+# mv data/redeemer/part_buyer_swap_redeemer-new.json data/redeemer/part_buyer_swap_redeemer.json
 
-variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/part_buyer_swap_redeemer.json > data/redeemer/part_buyer_swap_redeemer-new.json
-mv data/redeemer/part_buyer_swap_redeemer-new.json data/redeemer/part_buyer_swap_redeemer.json
+# variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/part_buyer_swap_redeemer.json > data/redeemer/part_buyer_swap_redeemer-new.json
+# mv data/redeemer/part_buyer_swap_redeemer-new.json data/redeemer/part_buyer_swap_redeemer.json
 
-TXIN=$(jq -r --arg alltxin "" --arg buyerPkh "${buyer_pkh}" 'to_entries[] | select(.value.inlineDatum.fields[0].fields[0].bytes == $buyerPkh) | .key | . + $alltxin + " --tx-in"' tmp/script_utxo.json)
-buyer_utxo=${TXIN::-8}
-echo BUYER UTXO ${buyer_utxo}
+# TXIN=$(jq -r --arg alltxin "" --arg buyerPkh "${buyer_pkh}" 'to_entries[] | select(.value.inlineDatum.fields[0].fields[0].bytes == $buyerPkh) | .key | . + $alltxin + " --tx-in"' tmp/script_utxo.json)
+# buyer_utxo=${TXIN::-8}
+# echo BUYER UTXO ${buyer_utxo}
 
-string=${buyer_utxo}
-IFS='#' read -ra array <<< "$string"
-# update tx id info
-variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/part_seller_swap_redeemer.json > data/redeemer/part_seller_swap_redeemer-new.json
-mv data/redeemer/part_seller_swap_redeemer-new.json data/redeemer/part_seller_swap_redeemer.json
-variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/part_seller_swap_redeemer.json > data/redeemer/part_seller_swap_redeemer-new.json
-mv data/redeemer/part_seller_swap_redeemer-new.json data/redeemer/part_seller_swap_redeemer.json
+# string=${buyer_utxo}
+# IFS='#' read -ra array <<< "$string"
+# # update tx id info
+# variable=${array[0]}; jq --arg variable "$variable" '.fields[0].fields[0].bytes=$variable' data/redeemer/part_seller_swap_redeemer.json > data/redeemer/part_seller_swap_redeemer-new.json
+# mv data/redeemer/part_seller_swap_redeemer-new.json data/redeemer/part_seller_swap_redeemer.json
+# variable=${array[1]}; jq --argjson variable "$variable" '.fields[0].fields[1].int=$variable' data/redeemer/part_seller_swap_redeemer.json > data/redeemer/part_seller_swap_redeemer-new.json
+# mv data/redeemer/part_seller_swap_redeemer-new.json data/redeemer/part_seller_swap_redeemer.json
 
 # exit
 
@@ -89,7 +89,7 @@ buyer_utxo_value=$(${cli} transaction calculate-min-required-utxo \
 script_address_out="${script_address} + ${script_utxo_value} + ${script_asset}"
 buyer_address_out="${buyer_address} + ${buyer_utxo_value} + ${seller_asset}"
 
-lovelace=$(jq -r '.fields[1].fields[2].int' data/datum/buyer_datum.json)
+lovelace=$(jq -r '.fields[1].fields[0].int' data/redeemer/part_buy_redeemer.json)
 seller_address_out="${seller_address} + ${lovelace}"
 echo "Script OUTPUT: "${script_address_out}
 echo "Buyer OUTPUT: "${buyer_address_out}
@@ -98,20 +98,20 @@ echo "Seller OUTPUT: "${seller_address_out}
 # exit
 #
 # Get tx payer info
-echo -e "\033[0;36m Gathering Batcher Bot UTxO Information  \033[0m"
+echo -e "\033[0;36m Gathering Buyer UTxO Information  \033[0m"
 ${cli} query utxo \
     ${network} \
-    --address ${batcher_address} \
-    --out-file tmp/batcher_utxo.json
+    --address ${buyer_address} \
+    --out-file tmp/buyer_utxo.json
 
-TXNS=$(jq length tmp/batcher_utxo.json)
+TXNS=$(jq length tmp/buyer_utxo.json)
 if [ "${TXNS}" -eq "0" ]; then
-   echo -e "\n \033[0;31m NO UTxOs Found At ${batcher_address} \033[0m \n";
+   echo -e "\n \033[0;31m NO UTxOs Found At ${buyer_address} \033[0m \n";
    exit;
 fi
 alltxin=""
-TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' tmp/batcher_utxo.json)
-batcher_tx_in=${TXIN::-8}
+TXIN=$(jq -r --arg alltxin "" 'keys[] | . + $alltxin + " --tx-in"' tmp/buyer_utxo.json)
+buyer_tx_in=${TXIN::-8}
 
 # collat info
 echo -e "\033[0;36m Gathering Collateral UTxO Information  \033[0m"
@@ -134,24 +134,20 @@ FEE=$(${cli} transaction build \
     --babbage-era \
     --protocol-params-file tmp/protocol.json \
     --out-file tmp/tx.draft \
-    --change-address ${batcher_address} \
+    --change-address ${buyer_address} \
     --tx-in-collateral ${collat_utxo} \
-    --tx-in ${batcher_tx_in} \
+    --tx-in ${buyer_tx_in} \
     --tx-in ${seller_utxo} \
     --spending-tx-in-reference="${script_ref_utxo}#1" \
     --spending-plutus-script-v2 \
     --spending-reference-tx-in-inline-datum-present \
-    --spending-reference-tx-in-redeemer-file data/redeemer/part_seller_swap_redeemer.json \
-    --tx-in ${buyer_utxo} \
-    --spending-tx-in-reference="${script_ref_utxo}#1" \
-    --spending-plutus-script-v2 \
-    --spending-reference-tx-in-inline-datum-present \
-    --spending-reference-tx-in-redeemer-file data/redeemer/part_buyer_swap_redeemer.json \
+    --spending-reference-tx-in-redeemer-file data/redeemer/part_buy_redeemer.json \
     --tx-out="${seller_address_out}" \
     --tx-out="${buyer_address_out}" \
     --tx-out="${script_address_out}" \
     --tx-out-inline-datum-file data/datum/partial_seller_datum.json  \
     --required-signer-hash ${collat_pkh} \
+    --required-signer-hash ${buyer_pkh} \
     ${network})
 
 IFS=':' read -ra VALUE <<< "${FEE}"

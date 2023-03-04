@@ -58,7 +58,7 @@ pub fn find_exact_payout(
   list.any(
     outputs,
     fn(output) {
-      list.and([output.address == pay_address, output.value == pay_value])
+      list.and([(output.address == pay_address)?, (output.value == pay_value)?])
     },
   )
 }
@@ -73,8 +73,8 @@ pub fn find_token_payout(
     fn(output) {
       list.and(
         [
-          (output.address == pay_address)?,
-          (value.quantity_of(output.value, pay_value.pid, pay_value.tkn) >= pay_value.amt)?,
+          output.address == pay_address,
+          value.quantity_of(output.value, pay_value.pid, pay_value.tkn) >= pay_value.amt,
         ],
       )
     },

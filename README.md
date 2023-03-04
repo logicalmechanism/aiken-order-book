@@ -45,7 +45,7 @@ An order may be updated at any time while in the contract. This is useful for sl
 
 Anyone is allowed to match orders within the contract if and only if the two UTxOs in the swap satisfy the validation parameters for either a full swap or a partial swap. A full swap is a complete swap where another UTxO is found to be within the slippage range, resulting in both UTxOs leaving the contract to their new owners. A partial swap is a swap where one UTxO has some of the token but not the full amount, resulting in one of the UTxOs returning to the contract in an attempt to be swapped again. The contract also allows market rate purchases with the full buy and partial buy end points. A wallet that is outside the contract can purchase the total or partial amount from a UTxO inside the contract. The price they pay is not determined by the slippage rate but at the price defined by the have and want token information.
 
-## Order Book Bot
+## Order Book Batcher Bot
 
 - TODO
 
@@ -64,5 +64,17 @@ aiken build
 ```
 
 ## Test Scripts
+
+Change into the scripts directory after building the contract using `aiken build`. The build function will produce the `plutus.json` file and will need to be converted into a cardano-cli friendly format.
+
+```
+python create_plutus_script.py
+```
+
+This will update the `order_book.plutus` file with the new compiled cbor.
+
+The test scripts follow the happy path, using wallets from the folder called `wallets`. It requires a seller, buyer, reference, collateral, and batcher wallet. Please use the testnet faucet to get tADA for testing. The files are designed to be followed in sequential order and not are smart so some tweaking may be need to change which token is being trade and for how much.
+
+### Batcher Bot Testing
 
 - TODO

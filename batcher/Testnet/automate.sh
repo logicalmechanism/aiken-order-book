@@ -102,6 +102,7 @@ echo
 ${SCRIPT_PATH}/create_wallets.sh
 ${SCRIPT_PATH}/fund_wallets.sh
 ${SCRIPT_PATH}/create_contract_references.sh
+echo "Sleep 5 secs to ensure update is received"; sleep 5
 ${SCRIPT_PATH}/create_tokens.sh
 
 echo "\033[1;35m\nTestnet is ready for testing! \033[0m"

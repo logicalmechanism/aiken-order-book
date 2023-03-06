@@ -34,8 +34,12 @@ variable=${minter_pkh}; jq --arg variable "$variable" '.scripts[0].keyHash=$vari
 mv policy/policy2-new.script policy/policy2.script
 
 
+
 policy1_id=$(cardano-cli transaction policyid --script-file policy/policy1.script)
 policy2_id=$(cardano-cli transaction policyid --script-file policy/policy2.script)
+echo $policy1_id > policy/policy1.id
+echo $policy2_id > policy/policy2.id
+
 token_name="5468697349734f6e6553746172746572546f6b656e466f7254657374696e6734"
 
 mint_asset1="1234567890 ${policy1_id}.${token_name}"
@@ -92,3 +96,7 @@ echo -e "\033[0;36m Submitting \033[0m"
 ${cli} transaction submit \
     ${network} \
     --tx-file ${ROOT}/tmp/tx.signed
+
+minter_tx_in=$(${cli} transaction txid --tx-file ${ROOT}/tmp/tx.signed )
+
+echo $minter_tx_in > ${ROOT}/tmp/minter-token.txin

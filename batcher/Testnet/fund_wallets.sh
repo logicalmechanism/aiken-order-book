@@ -58,3 +58,7 @@ echo -e "\033[0;36m Submitting \033[0m"
 ${cli} transaction submit \
     ${network} \
     --tx-file ${ROOT}/tmp/tx-distribution.signed
+
+minter_tx_in=$(${cli} transaction txid --tx-file ${ROOT}/tmp/tx-distribution.signed )
+
+echo $minter_tx_in > ${ROOT}/tmp/minter-lovelace.txin

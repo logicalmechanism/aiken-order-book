@@ -10,18 +10,26 @@ use order_book/datums.{Datum, OwnerInfo, SwapInfo, TokenInfo}
 use order_book/validators
 
 pub fn datum_a() -> Datum {
-  let owner: OwnerInfo = OwnerInfo { pkh: #"", sc: #"" }
-  let have: TokenInfo = TokenInfo { pid: #"", tkn: #"", amt: 10 }
-  let want: TokenInfo = TokenInfo { pid: #"acab", tkn: #"beef", amt: 10 }
-  let info: SwapInfo = SwapInfo { slip: 40 }
+  let owner: OwnerInfo =
+    OwnerInfo { pkh: #"", sc: #"" }
+  let have: TokenInfo =
+    TokenInfo { pid: #"", tkn: #"", amt: 10 }
+  let want: TokenInfo =
+    TokenInfo { pid: #"acab", tkn: #"beef", amt: 10 }
+  let info: SwapInfo =
+    SwapInfo { slip: 40 }
   Datum { owner, have, want, info }
 }
 
 pub fn datum_b() -> Datum {
-  let owner: OwnerInfo = OwnerInfo { pkh: #"0102", sc: #"" }
-  let have: TokenInfo = TokenInfo { pid: #"acab", tkn: #"beef", amt: 10 }
-  let want: TokenInfo = TokenInfo { pid: #"", tkn: #"", amt: 10 }
-  let info: SwapInfo = SwapInfo { slip: 40 }
+  let owner: OwnerInfo =
+    OwnerInfo { pkh: #"0102", sc: #"" }
+  let have: TokenInfo =
+    TokenInfo { pid: #"acab", tkn: #"beef", amt: 10 }
+  let want: TokenInfo =
+    TokenInfo { pid: #"", tkn: #"", amt: 10 }
+  let info: SwapInfo =
+    SwapInfo { slip: 40 }
   Datum { owner, have, want, info }
 }
 
@@ -105,8 +113,10 @@ pub fn tx_valid(
 }
 
 test good_update_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr = address.payment_address(#"", None)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let addr =
+    address.create_address(#"", #"")
   validators.update_validation(
     datum_a(),
     tx_valid(script_addr, addr, script_addr, addr, #""),
@@ -115,8 +125,10 @@ test good_update_tx() {
 }
 
 test bad_signer_update_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr = address.payment_address(#"", None)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let addr =
+    address.create_address(#"", #"")
   validators.update_validation(
     datum_a(),
     tx_valid(script_addr, addr, script_addr, addr, #"acab"),
@@ -126,8 +138,8 @@ test bad_signer_update_tx() {
 
 // no way to test for errors yet
 // test no_cont_update_tx() {
-//   let script_addr = address.payment_address(#"0102", None)
-//   let addr = address.payment_address(#"", None)
+//   let script_addr = address.create_address(#"0102", #"")
+//   let addr = address.create_address(#"", #"")
 //   validators.update_validation(
 //     datum_a(),
 //     tx_valid(script_addr, addr, addr, addr, #""),
@@ -136,8 +148,10 @@ test bad_signer_update_tx() {
 // }
 
 test two_inputs_update_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr = address.payment_address(#"", None)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let addr =
+    address.create_address(#"", #"")
   validators.update_validation(
     datum_a(),
     tx_valid(script_addr, script_addr, script_addr, addr, #""),
@@ -146,8 +160,10 @@ test two_inputs_update_tx() {
 }
 
 test two_ouputs_update_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr = address.payment_address(#"", None)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let addr =
+    address.create_address(#"", #"")
   validators.update_validation(
     datum_a(),
     tx_valid(script_addr, addr, script_addr, script_addr, #""),
@@ -156,8 +172,10 @@ test two_ouputs_update_tx() {
 }
 
 test bad_cont_datum_update_tx() {
-  let script_addr = address.payment_address(#"0102", None)
-  let addr = address.payment_address(#"", None)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let addr =
+    address.create_address(#"", #"")
   validators.update_validation(
     datum_a(),
     tx_valid(script_addr, addr, addr, script_addr, #""),

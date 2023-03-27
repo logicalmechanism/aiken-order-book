@@ -60,11 +60,11 @@ pub fn part_swap_datum_check(
       (inbound_datum.owner.pkh != outbound_datum.owner.pkh)?,
       (inbound_datum.have.pid == outbound_datum.want.pid)?,
       (inbound_datum.have.tkn == outbound_datum.want.tkn)?,
-      !math.is_int_in_range(
+      (math.is_int_in_range(
         inbound_datum.have.amt,
         inbound_datum.info.slip,
         outbound_datum.want.amt,
-      )?,
+      ) == False)?,
       is_in_effective_range(inbound_datum, outbound_datum)?,
     ],
   )
@@ -75,8 +75,10 @@ pub fn part_swap_cont_check(
   outbound_datum: Datum,
   that_datum: Datum,
 ) {
-  let have_diff = inbound_datum.have.amt - that_datum.want.amt
-  let want_amt = have_diff * inbound_datum.want.amt / inbound_datum.have.amt
+  let have_diff =
+    inbound_datum.have.amt - that_datum.want.amt
+  let want_amt =
+    have_diff * inbound_datum.want.amt / inbound_datum.have.amt
   list.and(
     [
       (have_diff == outbound_datum.have.amt)?,
@@ -91,8 +93,10 @@ pub fn part_buy_datum_check(
   outbound_datum: Datum,
   pay_amt: Int,
 ) -> Bool {
-  let have_diff = inbound_datum.have.amt - pay_amt
-  let want_amt = have_diff * inbound_datum.want.amt / inbound_datum.have.amt
+  let have_diff =
+    inbound_datum.have.amt - pay_amt
+  let want_amt =
+    have_diff * inbound_datum.want.amt / inbound_datum.have.amt
   list.and(
     [
       constant_ownership(inbound_datum, outbound_datum),
@@ -117,15 +121,19 @@ pub fn constant_have_want_info(
   )
 }
 
-fn is_in_effective_range(part_a: Datum, part_b: Datum) -> Bool {
-  let a_price = math.effective_price(part_a.have.amt, part_a.want.amt)
-  let b_price = math.effective_price(part_b.want.amt, part_b.have.amt)
+pub fn is_in_effective_range(part_a: Datum, part_b: Datum) -> Bool {
+  let a_price =
+    math.effective_price(part_a.have.amt, part_a.want.amt)
+  let b_price =
+    math.effective_price(part_b.want.amt, part_b.have.amt)
   math.is_int_in_range(a_price, part_a.info.slip, b_price)
 }
 
 pub fn check_if_cont(part_a: Datum, part_b: Datum) -> Bool {
-  let left_side = part_a.have.amt < part_b.want.amt == True
-  let right_side = part_a.want.amt < part_b.have.amt == True
+  let left_side =
+    part_a.have.amt < part_b.want.amt == True
+  let right_side =
+    part_a.want.amt < part_b.have.amt == True
   if left_side != right_side {
     error @"Bad Trade"
   } else {

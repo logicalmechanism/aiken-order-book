@@ -1,6 +1,5 @@
 use aiken/dict
 use aiken/interval.{Interval, IntervalBound, NegativeInfinity, PositiveInfinity}
-use aiken/list
 use aiken/transaction.{
   InlineDatum, Input, NoDatum, Output, OutputReference, Transaction,
   TransactionId,
@@ -8,32 +7,43 @@ use aiken/transaction.{
 use aiken/transaction/credential.{Address}
 use aiken/transaction/value
 use order_book/address
-use order_book/data
 use order_book/datums.{Datum, OwnerInfo, SwapInfo, TokenInfo}
 use order_book/redeemers.{UTxO}
 use order_book/validators
 
 pub fn datum_a() -> Datum {
-  let owner: OwnerInfo = OwnerInfo { pkh: #"", sc: #"" }
-  let have: TokenInfo = TokenInfo { pid: #"", tkn: #"", amt: 200 }
-  let want: TokenInfo = TokenInfo { pid: #"acab", tkn: #"beef", amt: 100 }
-  let info: SwapInfo = SwapInfo { slip: 40 }
+  let owner: OwnerInfo =
+    OwnerInfo { pkh: #"", sc: #"" }
+  let have: TokenInfo =
+    TokenInfo { pid: #"", tkn: #"", amt: 200 }
+  let want: TokenInfo =
+    TokenInfo { pid: #"acab", tkn: #"beef", amt: 100 }
+  let info: SwapInfo =
+    SwapInfo { slip: 40 }
   Datum { owner, have, want, info }
 }
 
 pub fn datum_a_cont() -> Datum {
-  let owner: OwnerInfo = OwnerInfo { pkh: #"", sc: #"" }
-  let have: TokenInfo = TokenInfo { pid: #"", tkn: #"", amt: 100 }
-  let want: TokenInfo = TokenInfo { pid: #"acab", tkn: #"beef", amt: 50 }
-  let info: SwapInfo = SwapInfo { slip: 40 }
+  let owner: OwnerInfo =
+    OwnerInfo { pkh: #"", sc: #"" }
+  let have: TokenInfo =
+    TokenInfo { pid: #"", tkn: #"", amt: 100 }
+  let want: TokenInfo =
+    TokenInfo { pid: #"acab", tkn: #"beef", amt: 50 }
+  let info: SwapInfo =
+    SwapInfo { slip: 40 }
   Datum { owner, have, want, info }
 }
 
 pub fn datum_b() -> Datum {
-  let owner: OwnerInfo = OwnerInfo { pkh: #"acab", sc: #"" }
-  let have: TokenInfo = TokenInfo { pid: #"acab", tkn: #"beef", amt: 50 }
-  let want: TokenInfo = TokenInfo { pid: #"", tkn: #"", amt: 100 }
-  let info: SwapInfo = SwapInfo { slip: 40 }
+  let owner: OwnerInfo =
+    OwnerInfo { pkh: #"acab", sc: #"" }
+  let have: TokenInfo =
+    TokenInfo { pid: #"acab", tkn: #"beef", amt: 50 }
+  let want: TokenInfo =
+    TokenInfo { pid: #"", tkn: #"", amt: 100 }
+  let info: SwapInfo =
+    SwapInfo { slip: 40 }
   Datum { owner, have, want, info }
 }
 
@@ -129,22 +139,20 @@ pub fn tx_valid(
   tx
 }
 
-test find_out_datum() {
-  let script_addr = address.create_address(#"0102", #"")
-  let sell_addr = address.create_address(#"", #"")
-  let buy_addr = address.create_address(#"acab", #"")
-  let tx = tx_valid(script_addr, script_addr, script_addr, sell_addr, buy_addr)
-  let outbound_output =
-    list.find(tx.outputs, fn(output) { output.address == script_addr })
-  expect outbound_datum: Datum = data.find_outbound_datum(outbound_output)
-  outbound_datum == datum_a_cont()
+test part_datum_check() {
+  // datums.part_swap_cont_check(datum_a(), datum_a_cont(), datum_b()) == True
+  datums.part_swap_datum_check(datum_a(), datum_b()) == True
 }
 
 test good_part_swap_tx() {
-  let script_addr = address.create_address(#"0102", #"")
-  let sell_addr = address.create_address(#"", #"")
-  let buy_addr = address.create_address(#"acab", #"")
-  let utxo = UTxO(#"", 1)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let sell_addr =
+    address.create_address(#"", #"")
+  let buy_addr =
+    address.create_address(#"acab", #"")
+  let utxo =
+    UTxO(#"", 1)
   validators.part_swap_validation(
     datum_a(),
     tx_valid(script_addr, script_addr, script_addr, sell_addr, buy_addr),
@@ -154,10 +162,14 @@ test good_part_swap_tx() {
 }
 
 test good_part_swap_tx2() {
-  let script_addr = address.create_address(#"0102", #"")
-  let sell_addr = address.create_address(#"", #"")
-  let buy_addr = address.create_address(#"acab", #"")
-  let utxo = UTxO(#"", 0)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let sell_addr =
+    address.create_address(#"", #"")
+  let buy_addr =
+    address.create_address(#"acab", #"")
+  let utxo =
+    UTxO(#"", 0)
   validators.part_swap_validation(
     datum_b(),
     tx_valid(script_addr, script_addr, script_addr, sell_addr, buy_addr),
@@ -167,10 +179,14 @@ test good_part_swap_tx2() {
 }
 
 test bad_part_swap_tx() {
-  let script_addr = address.create_address(#"0102", #"")
-  let sell_addr = address.create_address(#"", #"")
-  let buy_addr = address.create_address(#"acab", #"")
-  let utxo = UTxO(#"", 1)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let sell_addr =
+    address.create_address(#"", #"")
+  let buy_addr =
+    address.create_address(#"acab", #"")
+  let utxo =
+    UTxO(#"", 1)
   validators.part_swap_validation(
     datum_a(),
     tx_valid(script_addr, script_addr, script_addr, buy_addr, sell_addr),
@@ -180,10 +196,14 @@ test bad_part_swap_tx() {
 }
 
 test bad_part_swap_tx2() {
-  let script_addr = address.create_address(#"0102", #"")
-  let sell_addr = address.create_address(#"", #"")
-  let buy_addr = address.create_address(#"acab", #"")
-  let utxo = UTxO(#"", 0)
+  let script_addr =
+    address.create_address(#"0102", #"")
+  let sell_addr =
+    address.create_address(#"", #"")
+  let buy_addr =
+    address.create_address(#"acab", #"")
+  let utxo =
+    UTxO(#"", 0)
   validators.part_swap_validation(
     datum_b(),
     tx_valid(script_addr, script_addr, script_addr, buy_addr, sell_addr),

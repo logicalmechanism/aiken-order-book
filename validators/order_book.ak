@@ -5,8 +5,12 @@ use order_book/redeemers.{
 }
 use order_book/validators
 
-validator order_book {
-  fn(datum: Datum, redeemer: Redeemer, context: ScriptContext) -> Bool {
+validator {
+  fn order_book(
+    datum: Datum,
+    redeemer: Redeemer,
+    context: ScriptContext,
+  ) -> Bool {
     when context.purpose is {
       Spend(output_reference) ->
         when redeemer is {
@@ -59,7 +63,8 @@ validator order_book {
             )
         }
       // anything other than spend fails
-      _ -> False
+      _ ->
+        False
     }
   }
 }

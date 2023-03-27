@@ -76,6 +76,8 @@ if __name__ == "__main__":
 
     full_swap = []
     part_swap = []
+    print("N Txs")
+    print(len(data))
     # Do something with the data
     for tx_hash1 in data:
         datum = data[tx_hash1]['inlineDatum']
@@ -102,7 +104,18 @@ if __name__ == "__main__":
                 
         # exit()
     print('full_swap')
-    print(full_swap)
+    print(len(full_swap))
     
     print('part_swap')
-    print(part_swap)
+    print(len(part_swap))
+    
+    
+    x = full_swap[0]
+    
+    print(data[x[0]]['value'])
+    print(data[x[0]]['inlineDatum'])
+    
+    print()
+    
+    
+    print(data[x[1]]['value'])

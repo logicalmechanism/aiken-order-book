@@ -42,8 +42,8 @@ echo $policy2_id > policy/policy2.id
 
 token_name="5468697349734f6e6553746172746572546f6b656e466f7254657374696e6734"
 
-mint_asset1="1234567890 ${policy1_id}.${token_name}"
-mint_asset2="1234567890 ${policy2_id}.${token_name}"
+mint_asset1="9223372036854775807 ${policy1_id}.${token_name}"
+mint_asset2="9223372036854775807 ${policy2_id}.${token_name}"
 total_mint_asset="${mint_asset1} + ${mint_asset2}"
 
 echo "Starter Token 1: ${mint_asset1}"

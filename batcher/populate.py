@@ -91,7 +91,7 @@ def tx_hash():
 
 
 def calculate_have_want():
-    p_0 = random.gauss(2.5, 1)
+    p_0 = random.gauss(2.5, 0.95)
     if p_0 <= 0:
         return calculate_have_want()
     want = random.randint(10000,100000)
@@ -147,7 +147,7 @@ def create_datum(owner, have, have_amt, want, want_amt):
                 "constructor": 0,
                 "fields": [
                     {
-                        "int": random.randint(10,100)
+                        "int": random.randint(4,40) # 2.5% to 25%
                     }
                 ]
             }
@@ -170,7 +170,7 @@ if __name__ == "__main__":
     os.environ["CARDANO_NODE_SOCKET_PATH"] = os.getenv("socket")
     print(os.getenv("CARDANO_NODE_SOCKET_PATH"))
     
-    n_tx = 150
+    n_tx = 1500
     fee = 964314
     with open('node/tmp/minter-lovelace.txin', "r") as f:
         minter_lovelace_tx = f.readline().strip('\n') + "#5"
@@ -191,8 +191,8 @@ if __name__ == "__main__":
         buyer_pkh = f.readline().strip('\n')
     
     change = 10000000000
-    token_a = 1234567890
-    token_b = 1234567890
+    token_a = 9223372036854775807
+    token_b = 9223372036854775807
     token_name = "5468697349734f6e6553746172746572546f6b656e466f7254657374696e6734"
     
     # build and sign n_tx transactions
@@ -215,7 +215,7 @@ if __name__ == "__main__":
             token_b -= have
             create_datum(owner, policy2_id, have, policy1_id, want)
         if token_a < 0 or token_b < 0:
-            print(i)
+            print('ENDING',i)
             break
         token_change = f"{token_a} {policy1_id}.{token_name} + {token_b} {policy2_id}.{token_name}"
         

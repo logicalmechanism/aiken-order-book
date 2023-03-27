@@ -61,6 +61,7 @@ To build the contract.
 
 ```
 aiken build
+aiken blueprint convert > order_book.plutus
 ```
 
 ## Test Scripts
